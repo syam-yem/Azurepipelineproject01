@@ -1,0 +1,9 @@
+{
+	"name": "Azureproject11",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "4232c508-8387-4cee-8cf2-b9b140793227",
+		"tenantId": "471cd0fd-43d5-4265-ae00-a0ce53e9670a"
+	}
+}

@@ -1,0 +1,13 @@
+{
+	"name": "HttpServer1",
+	"properties": {
+		"description": "To receive the data from",
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://github.com",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

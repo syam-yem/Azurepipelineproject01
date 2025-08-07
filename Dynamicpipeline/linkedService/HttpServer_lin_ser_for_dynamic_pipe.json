@@ -1,0 +1,12 @@
+{
+	"name": "HttpServer_lin_ser_for_dynamic_pipe",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://raw.githubusercontent.com",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

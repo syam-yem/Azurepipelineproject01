@@ -1,0 +1,9 @@
+{
+	"name": "Azurepipelineproject01",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "8a8e505c-c419-4abc-a016-f50983fec879",
+		"tenantId": "471cd0fd-43d5-4265-ae00-a0ce53e9670a"
+	}
+}

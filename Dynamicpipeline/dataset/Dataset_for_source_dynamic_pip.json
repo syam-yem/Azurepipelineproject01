@@ -1,0 +1,30 @@
+{
+	"name": "Dataset_for_source_dynamic_pip",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HttpServer_lin_ser_for_dynamic_pipe",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_rel_url": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().p_rel_url",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

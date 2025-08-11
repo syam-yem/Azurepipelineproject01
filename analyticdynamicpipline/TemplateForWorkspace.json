@@ -1,0 +1,137 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "analyticdynamicpipline"
+		},
+		"analyticdynamicpipline-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'analyticdynamicpipline-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:analyticdynamicpipline.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"analyticdynamicpipline-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://pythonstorageaccount01.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/analyticdynamicpipline-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('analyticdynamicpipline-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/analyticdynamicpipline-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('analyticdynamicpipline-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Dynamic pip SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE SCHEMA GOLD;\n\nCREATE VIEW GOLD.CALENDAR\nAS\nSELECT * \nFROM\nOPENROWSET\n(\n    BULK 'https://pythonstorageaccount01.blob.core.windows.net/silver/AdventureWorks_Calendar',\n    FORMAT = 'PARQUET'\n) \nas  Query1;\n\n\n CREATE DATABASE SCOPED CREDENTIAL cred_syam\nWITH\n    IDENTITY = 'Managed Identity';\n\n\n\n\n CREATE EXTERNAL DATA SOURCE Mydatasource\n WITH\n (\n    LOCATION='https://pythonstorageaccount01.blob.core.windows.net/gold/'\n );\n\n\n CREATE EXTERNAL FILE FORMAT myfileformat\n WITH\n (\n    FORMAT_TYPE = PARQUET,\n    DATA_COMPRESSION ='org.apache.hadoop.io.compress.SnappyCodec'\n    );\n\nCREATE EXTERNAL TABLE GOLD.myexternaltable01\n(\n    customer_id NVARCHAR(50),\n    customer_name NVARCHAR(50),\n    order_date DATE\n)\nWITH\n(\n    LOCATION = 'AdventureWorks_Calendar/',\n    DATA_SOURCE =Mydatasource,\n    FILE_FORMAT=myfileformat\n\n);\n\n\nCREATE EXTERNAL TABLE GOLD.myexternaltable01\n(\n    customer_id NVARCHAR(50),\n    customer_name NVARCHAR(50),\n    order_date DATE\n)\nWITH\n(\n    LOCATION = 'AdventureWorks_Calendar/',\n    DATA_SOURCE =Mydatasource,\n    FILE_FORMAT=myfileformat\n\n);\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Dynamicpip",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Dynamicpip",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		}
+	]
+}

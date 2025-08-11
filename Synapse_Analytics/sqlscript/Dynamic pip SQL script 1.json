@@ -1,0 +1,17 @@
+{
+	"name": "Dynamic pip SQL script 1",
+	"properties": {
+		"content": {
+			"query": "\n\n CREATE DATABASE SCOPED CREDENTIAL cred_syam\nWITH\n    IDENTITY = 'Managed Identity';\n\n\n\n\n CREATE EXTERNAL DATA SOURCE Mydatasource\n WITH\n (\n    LOCATION='https://pythonstorageaccount01.blob.core.windows.net/silver/'\n );\n\n\n CREATE EXTERNAL FILE FORMAT myfileformat\n WITH\n (\n    FORMAT_TYPE = PARQUET,\n    DATA_COMPRESSION ='org.apache.hadoop.io.compress.SnappyCodec'\n    );\n\nCREATE EXTERNAL TABLE GOLD.myexternaltable01\n(\n    customer_id NVARCHAR(50),\n    customer_name NVARCHAR(50),\n    order_date DATE\n)\nWITH\n(\n    LOCATION = 'AdventureWorks_Calendar/',\n    DATA_SOURCE =Mydatasource,\n    FILE_FORMAT=myfileformat\n\n);\n\n\nCREATE EXTERNAL TABLE GOLD.myexternaltable01\n(\n    customer_id NVARCHAR(50),\n    customer_name NVARCHAR(50),\n    order_date DATE\n)\nWITH\n(\n    LOCATION = 'AdventureWorks_Calendar/',\n    DATA_SOURCE =Mydatasource,\n    FILE_FORMAT=myfileformat\n\n);\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Dynamicpip",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
